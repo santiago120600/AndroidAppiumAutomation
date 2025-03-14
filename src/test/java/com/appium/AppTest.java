@@ -45,6 +45,11 @@ public class AppTest {
         AndroidDriver driver = new AndroidDriver(new URI("http://0.0.0.0:4723").toURL(), options);
         driver.quit();
         service.stop();
+        ProcessBuilder closeEmulator = new ProcessBuilder("adb", "emu", "kill");
+        try{
+            closeEmulator.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
 }
