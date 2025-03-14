@@ -40,7 +40,7 @@ public class AppTest {
     }
 
     private void startEmulator() {
-        ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator"), "-avd", prop.getProperty("deviceName"), "-wipe-data", "-no-window");
+        ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator.location"), "-avd", prop.getProperty("device.name"));
         try {
             pb.start();
         } catch (IOException e) {
@@ -80,9 +80,9 @@ public class AppTest {
 
     private void startAppiumServer() {
         service = new AppiumServiceBuilder()
-                .withAppiumJS(new File(prop.getProperty("appium")))
-                .withIPAddress("0.0.0.0")
-                .usingPort(4723)
+                .withAppiumJS(new File(prop.getProperty("appium.location")))
+                .withIPAddress(prop.getProperty("appium.server"))
+                .usingPort(Integer.parseInt(prop.getProperty("appium.port")))
                 .build();
         service.start();
     }
@@ -90,9 +90,9 @@ public class AppTest {
     private void initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
         options.setDeviceName(prop.getProperty("deviceName"));
-        Path path = Paths.get("src/test/resources/ApiDemos-debug.apk");
+        Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
-        driver = new AndroidDriver(new URI("http://0.0.0.0:4723").toURL(), options);
+        driver = new AndroidDriver(new URI("http://"+prop.getProperty("appium.server")+":"+prop.getProperty("appium.port")).toURL(), options);
     }
 
     @Test
