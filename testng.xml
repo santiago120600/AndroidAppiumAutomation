@@ -2,7 +2,7 @@
 <suite name="Appium Test Suite">
     <test name="Appium Tests">
         <classes>
-            <class name="com.appium.AppTest" />
+            <class name="com.appium.AppiumBasics" />
         </classes>
     </test>
 </suite>

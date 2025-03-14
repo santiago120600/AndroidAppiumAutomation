@@ -18,7 +18,7 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "args": ["test"],
+            "args": ["clean", "test","-DsuiteXmlFile=testng.xml"],
 			"problemMatcher": []
 		},
 		{

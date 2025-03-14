@@ -14,17 +14,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 
-public class AppTest {
+public class BaseTest {
 
     private AppiumDriverLocalService service;
-    private AndroidDriver driver;
+    protected AndroidDriver driver;
     private Properties prop;
 
     @BeforeClass
@@ -89,16 +88,10 @@ public class AppTest {
 
     private void initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
-        options.setDeviceName(prop.getProperty("deviceName"));
+        options.setDeviceName(prop.getProperty("device.name"));
         Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
         driver = new AndroidDriver(new URI("http://"+prop.getProperty("appium.server")+":"+prop.getProperty("appium.port")).toURL(), options);
-    }
-
-    @Test
-    public void appiumTest() {
-        // Add your test logic here
-        System.out.println("Running Appium test...");
     }
 
     @AfterClass
