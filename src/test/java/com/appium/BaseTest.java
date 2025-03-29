@@ -1,9 +1,12 @@
 package com.appium;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -32,14 +35,20 @@ public class BaseTest {
         try (FileInputStream path = new FileInputStream("src/test/resources/global.properties")) {
             prop.load(path);
         }
-
-        startEmulator();
-        startAppiumServer();
+        if (!checkIfAndroidEmulatorIsRunnning()) {
+            startEmulator();
+        }
+        if (!checkIfAppiumServerIsRunnning(Integer.parseInt(prop.getProperty("appium.port")))) {
+            startAppiumServer();
+        } else {
+            service = createAppiumServiceBuilder().build();
+        }
         initializeDriver();
     }
 
     private void startEmulator() {
-        ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator.location"), "-avd", prop.getProperty("device.name"));
+        ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator.location"), "-avd",
+                prop.getProperty("device.name"));
         try {
             pb.start();
         } catch (IOException e) {
@@ -56,6 +65,36 @@ public class BaseTest {
                 throw new RuntimeException("Interrupted while waiting for emulator to be ready", e);
             }
         }
+    }
+
+    private boolean checkIfAndroidEmulatorIsRunnning() {
+        ProcessBuilder pb = new ProcessBuilder("adb", "devices");
+        boolean isEmulatorRunning = false;
+        try {
+            Process process = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            // First get all running devices
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("emulator") && line.contains("device")) {
+                    String deviceId = line.split("\\s+")[0];
+
+                    // Now check the AVD name for this device
+                    ProcessBuilder avdPb = new ProcessBuilder("adb", "-s", deviceId, "emu", "avd", "name");
+                    Process avdProcess = avdPb.start();
+                    BufferedReader avdReader = new BufferedReader(new InputStreamReader(avdProcess.getInputStream()));
+                    String avdName = avdReader.readLine();
+
+                    if (prop.getProperty("device.name").equals(avdName)) {
+                        isEmulatorRunning = true;
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error checking if emulator is running: " + e.getMessage());
+        }
+        return isEmulatorRunning;
     }
 
     private boolean isEmulatorReady() {
@@ -78,12 +117,31 @@ public class BaseTest {
     }
 
     private void startAppiumServer() {
-        service = new AppiumServiceBuilder()
+        service = createAppiumServiceBuilder().build();
+        service.start();
+    }
+
+    private AppiumServiceBuilder createAppiumServiceBuilder() {
+        return new AppiumServiceBuilder()
                 .withAppiumJS(new File(prop.getProperty("appium.location")))
                 .withIPAddress(prop.getProperty("appium.server"))
-                .usingPort(Integer.parseInt(prop.getProperty("appium.port")))
-                .build();
-        service.start();
+                .usingPort(Integer.parseInt(prop.getProperty("appium.port")));
+    }
+
+    private static boolean checkIfAppiumServerIsRunnning(int port) {
+        boolean isServerRunning = false;
+        ServerSocket serverSocket;
+        try {
+            serverSocket = new ServerSocket(port);
+            serverSocket.close();
+        } catch (IOException e) {
+            //If control comes here, then it means that the port is in use
+            isServerRunning = true;
+        } finally {
+
+            serverSocket = null;
+        }
+        return isServerRunning;
     }
 
     private void initializeDriver() throws URISyntaxException, MalformedURLException {
@@ -100,7 +158,7 @@ public class BaseTest {
             driver.quit();
         }
         if (service != null) {
-            service.stop();
+            service.stop();//server is not stopping
         }
         stopEmulator();
     }
