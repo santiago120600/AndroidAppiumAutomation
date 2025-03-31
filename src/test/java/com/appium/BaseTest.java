@@ -32,6 +32,7 @@ public class BaseTest {
     private AppiumDriverLocalService service;
     protected AndroidDriver driver;
     private Properties prop;
+    private boolean serverStartedByTest = false;
 
     @BeforeClass
     public void setUp() throws IOException, URISyntaxException {
@@ -54,6 +55,7 @@ public class BaseTest {
         if (!checkIfAppiumServerIsRunnning(Integer.parseInt(prop.getProperty("appium.port")))) {
             logger.info("Appium server is not running. Starting Appium server...");
             startAppiumServer();
+            serverStartedByTest = true;
         } else {
             logger.info("Appium server is already running.");
             service = createAppiumServiceBuilder().build();
@@ -213,9 +215,12 @@ public class BaseTest {
             driver.quit();
             logger.info("AndroidDriver quit successfully.");
         }
-        if (service != null) {
+        if (service != null && serverStartedByTest) {
             service.stop();
             logger.info("Appium server stopped.");
+        }
+        else {
+            logger.info("Appium server was not started by this test; leaving it running.");
         }
         stopEmulator();
     }
