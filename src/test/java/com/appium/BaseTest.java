@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -67,23 +66,41 @@ public class BaseTest {
     private void startEmulator() {
         ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator.location"), "-avd",
                 prop.getProperty("device.name"));
+        pb.redirectErrorStream(true); // Combine stdout and stderr
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD); // Prevent blocking by discarding output
         try {
             pb.start();
             logger.info("Emulator started successfully for device: {}", prop.getProperty("device.name"));
+            // Give some initial time for the emulator to initialize
+            Thread.sleep(5000);
         } catch (IOException e) {
             logger.error("Failed to start emulator", e);
             throw new RuntimeException("Failed to start emulator", e);
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while starting emulator", e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while starting emulator", e);
         }
 
-        while (!isEmulatorReady()) {
+        int maxWaitTimeSeconds = 120; // Maximum wait time (adjust as needed)
+        int elapsedTimeSeconds = 0;
+        int pollingIntervalSeconds = 5;
+
+        while (!isEmulatorReady() && elapsedTimeSeconds < maxWaitTimeSeconds) {
             try {
                 logger.debug("Waiting for emulator to be ready...");
-                Thread.sleep(5000);
+                Thread.sleep(pollingIntervalSeconds * 1000);
+                elapsedTimeSeconds += pollingIntervalSeconds;
             } catch (InterruptedException e) {
                 logger.error("Interrupted while waiting for emulator", e);
                 Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for emulator to be ready", e);
+                throw new RuntimeException("Interrupted while waiting for emulator", e);
             }
+        }
+
+        if (elapsedTimeSeconds >= maxWaitTimeSeconds) {
+            logger.error("Emulator failed to start within {} seconds", maxWaitTimeSeconds);
+            throw new RuntimeException("Emulator failed to start in time");
         }
         logger.info("Emulator is ready.");
     }
@@ -119,21 +136,38 @@ public class BaseTest {
 
     private boolean isEmulatorReady() {
         ProcessBuilder processBuilder = new ProcessBuilder("adb", "shell", "getprop", "sys.boot_completed");
-        try {
-            Process process = processBuilder.start();
-            process.waitFor(10, TimeUnit.SECONDS);
+        int maxAttempts = 3;
+        int attempt = 0;
 
-            try (Scanner scanner = new Scanner(process.getInputStream())) {
-                if (scanner.hasNext()) {
-                    String output = scanner.next().trim();
-                    logger.debug("Emulator boot status: {}", output);
-                    return output.equals("1");
+        while (attempt < maxAttempts) {
+            try {
+                Process process = processBuilder.start();
+                process.waitFor(5, TimeUnit.SECONDS); // Reduced timeout per attempt
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String output = reader.readLine();
+                    if (output != null && output.trim().equals("1")) {
+                        logger.debug("Emulator boot completed.");
+                        return true;
+                    }
+                }
+                attempt++;
+                logger.debug("Emulator not ready yet, attempt {}/{}", attempt, maxAttempts);
+                Thread.sleep(2000); // Wait before retrying
+            } catch (IOException | InterruptedException e) {
+                logger.warn("Failed to check emulator status on attempt {}/{}", attempt + 1, maxAttempts, e);
+                attempt++;
+                if (attempt < maxAttempts) {
+                    try {
+                        Thread.sleep(2000); // Wait before retrying
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("Interrupted while waiting to retry emulator status check", ie);
+                    }
                 }
             }
-        } catch (IOException | InterruptedException e) {
-            logger.error("Failed to check emulator status", e);
-            throw new RuntimeException("Failed to check emulator status", e);
         }
+        logger.warn("Emulator not ready after {} attempts", maxAttempts);
         return false;
     }
 
