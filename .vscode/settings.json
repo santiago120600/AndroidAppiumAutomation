@@ -1,0 +1,7 @@
+{
+    "java.debug.settings.exceptionBreakpoint.skipClasses": [
+        "$JDK",
+        "$Libraries",
+        "java.com.appium.PageFactory"
+    ]
+}

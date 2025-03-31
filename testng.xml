@@ -1,8 +1,12 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Appium Test Suite">
+<suite name="Appium Test Suite" verbose="2">
     <test name="Appium Tests">
         <classes>
-            <class name="com.appium.AppiumBasics" />
+            <class name="com.appium.AppiumBasics">
+                <methods>
+                    <include name="appiumTest"/>
+                </methods>
+            </class>
         </classes>
     </test>
 </suite>
