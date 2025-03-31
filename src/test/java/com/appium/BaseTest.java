@@ -33,6 +33,7 @@ public class BaseTest {
     protected AndroidDriver driver;
     private Properties prop;
     private boolean serverStartedByTest = false;
+    private boolean emulatorStartedByTest = false;
 
     @BeforeClass
     public void setUp() throws IOException, URISyntaxException {
@@ -48,6 +49,7 @@ public class BaseTest {
         if (!checkIfAndroidEmulatorIsRunnning()) {
             logger.info("Emulator is not running. Starting emulator...");
             startEmulator();
+            emulatorStartedByTest = true;
         } else {
             logger.info("Emulator is already running.");
         }
@@ -222,7 +224,11 @@ public class BaseTest {
         else {
             logger.info("Appium server was not started by this test; leaving it running.");
         }
-        stopEmulator();
+        if(emulatorStartedByTest){
+            stopEmulator();
+        }else{
+            logger.info("Android Emulator was not started by this test; leaving it running.");
+        }
     }
 
     private void stopEmulator() {
