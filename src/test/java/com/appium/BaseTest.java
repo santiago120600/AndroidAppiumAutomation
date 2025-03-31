@@ -15,6 +15,8 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -25,6 +27,9 @@ import io.appium.java_client.service.local.AppiumServiceBuilder;
 
 public class BaseTest {
 
+    // Declare SLF4J Logger
+    private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
+
     private AppiumDriverLocalService service;
     protected AndroidDriver driver;
     private Properties prop;
@@ -34,15 +39,28 @@ public class BaseTest {
         prop = new Properties();
         try (FileInputStream path = new FileInputStream("src/test/resources/global.properties")) {
             prop.load(path);
+            logger.info("Loaded global.properties file successfully");
+        } catch (IOException e) {
+            logger.error("Failed to load global.properties", e);
+            throw e;
         }
+
         if (!checkIfAndroidEmulatorIsRunnning()) {
+            logger.info("Emulator is not running. Starting emulator...");
             startEmulator();
+        } else {
+            logger.info("Emulator is already running.");
         }
+
         if (!checkIfAppiumServerIsRunnning(Integer.parseInt(prop.getProperty("appium.port")))) {
+            logger.info("Appium server is not running. Starting Appium server...");
             startAppiumServer();
         } else {
+            logger.info("Appium server is already running.");
             service = createAppiumServiceBuilder().build();
         }
+
+        logger.info("Initializing AndroidDriver...");
         initializeDriver();
     }
 
@@ -51,20 +69,23 @@ public class BaseTest {
                 prop.getProperty("device.name"));
         try {
             pb.start();
+            logger.info("Emulator started successfully for device: {}", prop.getProperty("device.name"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to start emulator", e);
             throw new RuntimeException("Failed to start emulator", e);
         }
 
         while (!isEmulatorReady()) {
             try {
+                logger.debug("Waiting for emulator to be ready...");
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Interrupted while waiting for emulator", e);
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted while waiting for emulator to be ready", e);
             }
         }
+        logger.info("Emulator is ready.");
     }
 
     private boolean checkIfAndroidEmulatorIsRunnning() {
@@ -74,12 +95,10 @@ public class BaseTest {
             Process process = pb.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            // First get all running devices
             while ((line = reader.readLine()) != null) {
                 if (line.contains("emulator") && line.contains("device")) {
                     String deviceId = line.split("\\s+")[0];
 
-                    // Now check the AVD name for this device
                     ProcessBuilder avdPb = new ProcessBuilder("adb", "-s", deviceId, "emu", "avd", "name");
                     Process avdProcess = avdPb.start();
                     BufferedReader avdReader = new BufferedReader(new InputStreamReader(avdProcess.getInputStream()));
@@ -87,12 +106,13 @@ public class BaseTest {
 
                     if (prop.getProperty("device.name").equals(avdName)) {
                         isEmulatorRunning = true;
+                        logger.info("Found running emulator with AVD name: {}", avdName);
                         break;
                     }
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error checking if emulator is running: " + e.getMessage());
+            logger.error("Error checking if emulator is running", e);
         }
         return isEmulatorRunning;
     }
@@ -106,11 +126,12 @@ public class BaseTest {
             try (Scanner scanner = new Scanner(process.getInputStream())) {
                 if (scanner.hasNext()) {
                     String output = scanner.next().trim();
+                    logger.debug("Emulator boot status: {}", output);
                     return output.equals("1");
                 }
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Failed to check emulator status", e);
             throw new RuntimeException("Failed to check emulator status", e);
         }
         return false;
@@ -119,6 +140,7 @@ public class BaseTest {
     private void startAppiumServer() {
         service = createAppiumServiceBuilder().build();
         service.start();
+        logger.info("Appium server started on {}:{}", prop.getProperty("appium.server"), prop.getProperty("appium.port"));
     }
 
     private AppiumServiceBuilder createAppiumServiceBuilder() {
@@ -134,12 +156,10 @@ public class BaseTest {
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.close();
+            logger.debug("Port {} is available.", port);
         } catch (IOException e) {
-            //If control comes here, then it means that the port is in use
             isServerRunning = true;
-        } finally {
-
-            serverSocket = null;
+            logger.debug("Port {} is in use, assuming Appium server is running.", port);
         }
         return isServerRunning;
     }
@@ -149,16 +169,19 @@ public class BaseTest {
         options.setDeviceName(prop.getProperty("device.name"));
         Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
-        driver = new AndroidDriver(new URI("http://"+prop.getProperty("appium.server")+":"+prop.getProperty("appium.port")).toURL(), options);
+        driver = new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
+        logger.info("AndroidDriver initialized successfully.");
     }
 
     @AfterClass
     public void tearDown() {
         if (driver != null) {
             driver.quit();
+            logger.info("AndroidDriver quit successfully.");
         }
         if (service != null) {
-            service.stop();//server is not stopping
+            service.stop();
+            logger.info("Appium server stopped.");
         }
         stopEmulator();
     }
@@ -167,8 +190,9 @@ public class BaseTest {
         ProcessBuilder closeEmulator = new ProcessBuilder("adb", "emu", "kill");
         try {
             closeEmulator.start();
+            logger.info("Emulator stopped successfully.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to stop emulator", e);
             throw new RuntimeException("Failed to stop emulator", e);
         }
     }
