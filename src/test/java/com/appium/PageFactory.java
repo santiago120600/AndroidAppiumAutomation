@@ -5,37 +5,20 @@ import com.appium.pageObjects.android.LandingPage;
 import com.appium.pageObjects.android.PreferencePage;
 
 import io.appium.java_client.android.AndroidDriver;
+import lombok.Getter;
 
 public class PageFactory {
-
+    
     private AndroidDriver driver;
-    private LandingPage landingPage;
-    private PreferencePage preferencePage;
-    private PreferenceDependenciesPage preferenceDependenciesPage;
+    @Getter(lazy = true) 
+    private final LandingPage landingPage = new LandingPage(driver);
+    @Getter(lazy = true) 
+    private final PreferencePage preferencePage = new PreferencePage(driver);
+    @Getter(lazy = true) 
+    private final PreferenceDependenciesPage preferenceDependenciesPage = new PreferenceDependenciesPage(driver);
     
     public PageFactory(AndroidDriver driver) {
         this.driver = driver;
-    }
-
-    public LandingPage getLandingPage() {
-        if (landingPage == null) {
-            landingPage = new LandingPage(driver);
-        }
-        return landingPage;
-    }
-
-    public PreferencePage getPreferencePage() {
-        if (preferencePage == null) {
-            preferencePage = new PreferencePage(driver);
-        }
-        return preferencePage;
-    }
-
-    public PreferenceDependenciesPage getPreferenceDependenciesPage() {
-        if (preferenceDependenciesPage == null) {
-            preferenceDependenciesPage = new PreferenceDependenciesPage(driver);
-        }
-        return preferenceDependenciesPage;
     }
 
 }
