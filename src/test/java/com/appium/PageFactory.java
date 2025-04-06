@@ -1,5 +1,6 @@
 package com.appium;
 
+import com.appium.pageObjects.PreferenceDependenciesPage;
 import com.appium.pageObjects.android.LandingPage;
 import com.appium.pageObjects.android.PreferencePage;
 
@@ -10,17 +11,31 @@ public class PageFactory {
     private AndroidDriver driver;
     private LandingPage landingPage;
     private PreferencePage preferencePage;
-
+    private PreferenceDependenciesPage preferenceDependenciesPage;
+    
     public PageFactory(AndroidDriver driver) {
         this.driver = driver;
     }
 
     public LandingPage getLandingPage() {
-        return new LandingPage(driver);
+        if (landingPage == null) {
+            landingPage = new LandingPage(driver);
+        }
+        return landingPage;
     }
 
     public PreferencePage getPreferencePage() {
-        return new PreferencePage(driver);
+        if (preferencePage == null) {
+            preferencePage = new PreferencePage(driver);
+        }
+        return preferencePage;
+    }
+
+    public PreferenceDependenciesPage getPreferenceDependenciesPage() {
+        if (preferenceDependenciesPage == null) {
+            preferenceDependenciesPage = new PreferenceDependenciesPage(driver);
+        }
+        return preferenceDependenciesPage;
     }
 
 }

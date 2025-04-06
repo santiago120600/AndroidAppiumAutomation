@@ -10,5 +10,9 @@ public class AppiumBasics extends BaseTest{
 
         pageFactory.getLandingPage().clickPreference();
         pageFactory.getPreferencePage().clickPreferenceDependencies();
+        pageFactory.getPreferenceDependenciesPage().clickWifiCheckBox();
+        pageFactory.getPreferenceDependenciesPage().clickWifiSettingsTextView();
+        pageFactory.getPreferenceDependenciesPage().typeWifiSettingBox("My Wifi");
+        pageFactory.getPreferenceDependenciesPage().clickWifiSettingOkButton();
     }
 }
