@@ -7,9 +7,10 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "mainClass": "org.testng.TestNG",
+            "mainClass": "org.junit.runner.JUnitCore",
+            "projectName": "${workspaceFolderBasename}",
             "args": [
-                "testng.xml"
+                "com.appium.runner.TestRunner",
             ]
         }
     ]

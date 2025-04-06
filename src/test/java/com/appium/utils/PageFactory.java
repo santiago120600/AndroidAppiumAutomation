@@ -1,4 +1,4 @@
-package com.appium;
+package com.appium.utils;
 
 import com.appium.pageObjects.PreferenceDependenciesPage;
 import com.appium.pageObjects.android.LandingPage;

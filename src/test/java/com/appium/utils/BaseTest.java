@@ -1,4 +1,4 @@
-package com.appium;
+package com.appium.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
@@ -35,8 +33,7 @@ public class BaseTest {
     private boolean serverStartedByTest = false;
     private boolean emulatorStartedByTest = false;
 
-    @BeforeClass
-    public void setUp() throws IOException, URISyntaxException {
+    public AndroidDriver setUp() throws IOException, URISyntaxException {
         prop = new Properties();
         try (FileInputStream path = new FileInputStream("src/test/resources/global.properties")) {
             prop.load(path);
@@ -64,7 +61,9 @@ public class BaseTest {
         }
 
         logger.info("Initializing AndroidDriver...");
-        initializeDriver();
+        driver = initializeDriver();
+        logger.info("AndroidDriver initialized successfully.");
+        return driver;
     }
 
     private void startEmulator() {
@@ -202,16 +201,14 @@ public class BaseTest {
         return isServerRunning;
     }
 
-    private void initializeDriver() throws URISyntaxException, MalformedURLException {
+    private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
         options.setDeviceName(prop.getProperty("device.name"));
         Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
-        driver = new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
-        logger.info("AndroidDriver initialized successfully.");
+        return new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
     }
 
-    @AfterClass
     public void tearDown() {
         if (driver != null) {
             driver.quit();
