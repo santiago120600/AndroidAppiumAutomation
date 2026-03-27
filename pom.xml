@@ -11,7 +11,7 @@
     <dependency>
         <groupId>io.appium</groupId>
         <artifactId>java-client</artifactId>
-        <version>9.4.0</version>
+        <version>10.1.0</version>
     </dependency>
     <dependency>
         <groupId>junit</groupId>
@@ -55,18 +55,4 @@
         <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.2.5</version>
-            <configuration>
-                <suiteXmlFiles>
-                    <suiteXmlFile>testng.xml</suiteXmlFile>
-                </suiteXmlFiles>
-            </configuration>
-        </plugin>
-    </plugins>
-  </build>
 </project>
