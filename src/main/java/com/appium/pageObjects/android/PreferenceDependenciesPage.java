@@ -1,9 +1,7 @@
-package com.appium.pageObjects;
+package com.appium.pageObjects.android;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-
-import com.appium.pageObjects.android.BasePageObject;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.pagefactory.AndroidFindBy;
