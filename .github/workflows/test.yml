@@ -6,10 +6,12 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v6
-      - name: Print Java & Maven version
-        run: |
-          java -version
-          mvn -version
+      - name: Set up JDK 17 for x64
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          architecture: x64
       - name: Cache dependencies
         id: cache-deps
         uses: actions/cache@v3
