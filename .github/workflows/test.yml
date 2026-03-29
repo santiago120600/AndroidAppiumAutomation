@@ -15,15 +15,16 @@ jobs:
           cache: maven
       - name: Install dependencies
         run: mvn -B -DskipTests clean install
-      - name: Set up node 18 for x64
+      - name: Set up node
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '20'
       - name: Install appium
         run: |
-          npm install -g appium@3
+          npm install -g appium@3.2.2
           appium driver install uiautomator2
       - name: Verify appium installation
+        continue-on-error: true
         run: |
           echo "Appium version:"
           appium --version
@@ -31,7 +32,7 @@ jobs:
           which appium
           echo "Global npm root directory:"
           npm root -g
-          find $(npm root -g)/appium -type f -name "main.js" 2>/dev/null || echo "main.js not found in npm global location"
+          find $(npm root -g) -name "main.js" -path "*/appium/*"
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

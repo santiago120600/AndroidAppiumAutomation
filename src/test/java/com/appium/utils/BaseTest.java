@@ -182,7 +182,6 @@ public class BaseTest {
 
     private AppiumServiceBuilder createAppiumServiceBuilder() {
         return new AppiumServiceBuilder()
-                .withAppiumJS(new File(prop.getProperty("appium.location")))
                 .withIPAddress(prop.getProperty("appium.server"))
                 .usingPort(Integer.parseInt(prop.getProperty("appium.port")));
     }
