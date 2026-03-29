@@ -67,13 +67,14 @@ public class BaseTest {
     }
 
     private void startEmulator() {
-        ProcessBuilder pb = new ProcessBuilder(prop.getProperty("emulator.location"), "-avd",
-                prop.getProperty("device.name"));
+        logger.info("Starting Android emulator with AVD name: {}", System.getProperty("profile"));
+        ProcessBuilder pb = new ProcessBuilder("emulator", "-avd",
+                System.getProperty("profile"));
         pb.redirectErrorStream(true); // Combine stdout and stderr
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD); // Prevent blocking by discarding output
         try {
             pb.start();
-            logger.info("Emulator started successfully for device: {}", prop.getProperty("device.name"));
+            logger.info("Emulator started successfully for device: {}", System.getProperty("profile"));
             // Give some initial time for the emulator to initialize
             Thread.sleep(5000);
         } catch (IOException e) {
@@ -124,7 +125,7 @@ public class BaseTest {
                     BufferedReader avdReader = new BufferedReader(new InputStreamReader(avdProcess.getInputStream()));
                     String avdName = avdReader.readLine();
 
-                    if (prop.getProperty("device.name").equals(avdName)) {
+                    if (System.getProperty("profile").equals(avdName)) {
                         isEmulatorRunning = true;
                         logger.info("Found running emulator with AVD name: {}", avdName);
                         break;
@@ -202,7 +203,7 @@ public class BaseTest {
 
     private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
-        options.setDeviceName(prop.getProperty("device.name"));
+        options.setDeviceName(System.getProperty("profile"));
         Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
         return new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
