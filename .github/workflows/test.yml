@@ -31,16 +31,6 @@ jobs:
         run: |
           npm install -g appium@3.2.2
           appium driver install uiautomator2
-      - name: Verify appium installation
-        continue-on-error: true
-        run: |
-          echo "Appium version:"
-          appium --version
-          echo "Appium location:"
-          which appium
-          echo "Global npm root directory:"
-          npm root -g
-          find $(npm root -g) -name "main.js" -path "*/appium/*"
       - name: Start Appium server in background
         run: |
           appium server --address 0.0.0.0 --port 4723 --relaxed-security > appium.log 2>&1 &
@@ -67,13 +57,7 @@ jobs:
         run: |
           echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-      - name: Display available AVDs
-        run: |
-          echo "========================================="
-          avdmanager list device
-          echo "========================================="
       - name: Set up android emulator
-        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         env:
           PROFILE: 'pixel_3'
@@ -82,35 +66,6 @@ jobs:
           profile: ${{ env.PROFILE }}
           target: default
           script: |
-            echo "========================================="
-            echo "INSTALLED EMULATORS (AVDs):"
-            echo "========================================="
-            emulator -list-avds
-            
-            echo ""
-            echo "========================================="
-            echo "AVAILABLE SYSTEM IMAGES:"
-            echo "========================================="
-            sdkmanager --list | grep "system-images" | grep "android-29"
-            
-            echo ""
-            echo "========================================="
-            echo "EMULATOR DETAILS:"
-            echo "========================================="
-            echo "Connected devices:"
-            adb devices
-            
-            echo ""
-            echo "Boot status of the emulator:"
-            adb shell getprop sys.boot_completed
-            
-            echo ""
-            echo "Emulator name:"
-            adb -s emulator-5554 emu avd name
-            
-            echo ""
-            echo "Emulator properties:"
-            adb shell getprop | grep emu
             docker build -t appium-tests .
             docker run --rm --network host --add-host=host.docker.internal:host-gateway -e PROFILE=${{ env.PROFILE }} -e APP_PATH="$(pwd)/src/test/resources/ApiDemos-debug.apk" -v "$(pwd)/target:/app/target" appium-tests
           emulator-boot-timeout: 300
