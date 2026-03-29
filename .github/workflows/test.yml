@@ -23,3 +23,32 @@ jobs:
       - name: Install dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mvn -B -DskipTests clean install
+      - name: Set up node 18 for x64
+        uses: actions/setup-node@v6
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install appium
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Set up android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          profile: pixel_3
+          target: default
+          script: mvn -B test
+          emulator-boot-timeout: 300
+      - name: Run tests
+        run: mvn -B test
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: target/cucumber-reports.html
