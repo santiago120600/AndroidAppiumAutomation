@@ -40,24 +40,22 @@ jobs:
         run: |
           echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-      - name: Print emulator and adb info
-        continue-on-error: true
-        run: |
-          echo "List of available AVDs:"
-          emulator -list-avds # List available AVDs
-          echo "Connected devices:"
-          adb devices # List connected devices
-          echo "Boot status of the emulator:"
-          adb shell getprop sys.boot_completed
-          # adb -s emulator-5554 emu avd name
-          # emulator -avd pixel_3 # Start the emulator in the background
       - name: Set up android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           profile: pixel_3
           target: default
-          script: mvn -B test
+          script: |
+            echo "List of available AVDs:"
+            emulator -list-avds # List available AVDs
+            echo "Connected devices:"
+            adb devices # List connected devices
+            echo "Boot status of the emulator:"
+            adb shell getprop sys.boot_completed
+            # adb -s emulator-5554 emu avd name
+            # emulator -avd pixel_3 # Start the emulator in the background
+            mvn -B test
           emulator-boot-timeout: 300
       - name: Upload test report
         uses: actions/upload-artifact@v7
