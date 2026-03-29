@@ -54,16 +54,23 @@ jobs:
           ls -la $ANDROID_SDK_ROOT/system-images
           echo "Command line tools:"
           ls -la $ANDROID_SDK_ROOT/cmdline-tools
-          $ANDROID_SDK_ROOT/emulator/emulator --version
+          echo "Emulator AVDs:"
           $ANDROID_SDK_ROOT/emulator/emulator -list-avds
-          emulator --version
+          echo "Emulator AVDs:"
           emulator -list-avds
+          echo "ADB version"
           $ANDROID_SDK_ROOT/platform-tools/adb --version
+          echo "ADB devices:"
           $ANDROID_SDK_ROOT/platform-tools/adb devices
+          echo "ADB version"
           adb --version
+          echo "ADB devices:"
           adb devices
+          echo "adb location:"
           which adb
+          echo "emulator location:"
           which emulator
+          echo "java location:"
           which java
           echo "AVD home:"
           sdkmanager --list | grep "system-images" || true
