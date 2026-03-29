@@ -56,12 +56,35 @@ jobs:
           profile: pixel_3
           target: default
           script: |
-            echo "List of available AVDs:"
-            emulator -list-avds # List available AVDs
+            echo "========================================="
+            echo "INSTALLED EMULATORS (AVDs):"
+            echo "========================================="
+            emulator -list-avds
+            
+            echo ""
+            echo "========================================="
+            echo "AVAILABLE SYSTEM IMAGES:"
+            echo "========================================="
+            sdkmanager --list | grep "system-images" | grep "android-29"
+            
+            echo ""
+            echo "========================================="
+            echo "EMULATOR DETAILS:"
+            echo "========================================="
             echo "Connected devices:"
-            adb devices # List connected devices
+            adb devices
+            
+            echo ""
             echo "Boot status of the emulator:"
             adb shell getprop sys.boot_completed
+            
+            echo ""
+            echo "Emulator name:"
+            adb -s emulator-5554 emu avd name
+            
+            echo ""
+            echo "Emulator properties:"
+            adb shell getprop | grep emu
             mvn -B test
           emulator-boot-timeout: 300
       - name: Upload test report
