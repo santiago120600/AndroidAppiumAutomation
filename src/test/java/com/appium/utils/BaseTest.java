@@ -33,6 +33,12 @@ public class BaseTest {
     private boolean serverStartedByTest = false;
     private boolean emulatorStartedByTest = false;
 
+    protected String getProfile() {
+        String profile = System.getProperty("profile");
+        logger.info("Profile: {}", profile);
+        return profile;
+    }
+
     public AndroidDriver setUp() throws IOException, URISyntaxException {
         prop = new Properties();
         try (FileInputStream path = new FileInputStream("src/test/resources/global.properties")) {
@@ -67,14 +73,14 @@ public class BaseTest {
     }
 
     private void startEmulator() {
-        logger.info("Starting Android emulator with AVD name: {}", System.getProperty("profile"));
+        logger.info("Starting Android emulator with AVD name: {}", getProfile());
         ProcessBuilder pb = new ProcessBuilder("emulator", "-avd",
-                System.getProperty("profile"));
+                getProfile());
         pb.redirectErrorStream(true); // Combine stdout and stderr
         pb.redirectOutput(ProcessBuilder.Redirect.DISCARD); // Prevent blocking by discarding output
         try {
             pb.start();
-            logger.info("Emulator started successfully for device: {}", System.getProperty("profile"));
+            logger.info("Emulator started successfully for device: {}", getProfile());
             // Give some initial time for the emulator to initialize
             Thread.sleep(5000);
         } catch (IOException e) {
@@ -125,7 +131,7 @@ public class BaseTest {
                     BufferedReader avdReader = new BufferedReader(new InputStreamReader(avdProcess.getInputStream()));
                     String avdName = avdReader.readLine();
 
-                    if (System.getProperty("profile").equals(avdName)) {
+                    if (getProfile().equals(avdName)) {
                         isEmulatorRunning = true;
                         logger.info("Found running emulator with AVD name: {}", avdName);
                         break;
@@ -203,7 +209,7 @@ public class BaseTest {
 
     private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
-        options.setDeviceName(System.getProperty("profile"));
+        options.setDeviceName(getProfile());
         Path path = Paths.get(prop.getProperty("app.location"));
         options.setApp(path.toAbsolutePath().toString());
         return new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
