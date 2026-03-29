@@ -41,6 +41,13 @@ jobs:
           echo "Global npm root directory:"
           npm root -g
           find $(npm root -g) -name "main.js" -path "*/appium/*"
+      - name: Start Appium server in background
+        run: |
+          appium server --address 0.0.0.0 --port 4723 --relaxed-security > appium.log 2>&1 &
+          echo $! > appium.pid
+          sleep 10  # Give Appium time to start
+          echo "Appium started. Logs:"
+          cat appium.log || true
       - name: Set up Docker
         uses: docker/setup-docker-action@v5
       - name: Enable KVM
@@ -108,7 +115,10 @@ jobs:
             docker run --rm --network host --add-host=host.docker.internal:host-gateway -e PROFILE=${{ env.PROFILE }} -e APP_PATH="$(pwd)/src/test/resources/ApiDemos-debug.apk" -v "$(pwd)/target:/app/target" appium-tests
           emulator-boot-timeout: 300
       - name: Upload test report
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: test-report
-          path: target/cucumber-reports.html
+          path: |
+            target/cucumber-reports.html
+            appium.log
