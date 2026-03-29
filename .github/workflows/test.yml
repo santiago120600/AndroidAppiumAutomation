@@ -12,24 +12,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           architecture: x64
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          cache: maven
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: mvn -B -DskipTests clean install
       - name: Set up node 18 for x64
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '24'
       - name: Install appium
         run: |
-          npm install -g appium
+          npm install -g appium@3
           appium driver install uiautomator2
       - name: Enable KVM
         run: |
