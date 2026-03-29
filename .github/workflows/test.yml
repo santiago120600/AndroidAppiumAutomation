@@ -56,24 +56,27 @@ jobs:
           ls -la $ANDROID_SDK_ROOT/cmdline-tools
           echo "Emulator AVDs:"
           $ANDROID_SDK_ROOT/emulator/emulator -list-avds
-          echo "Emulator AVDs:"
-          emulator -list-avds
           echo "ADB version"
           $ANDROID_SDK_ROOT/platform-tools/adb --version
           echo "ADB devices:"
           $ANDROID_SDK_ROOT/platform-tools/adb devices
-          echo "ADB version"
-          adb --version
-          echo "ADB devices:"
-          adb devices
+          echo "java location:"
+          which java
+          echo "System images:"
+          sdkmanager --list | grep "system-images" || true
           echo "adb location:"
           which adb
           echo "emulator location:"
           which emulator
-          echo "java location:"
-          which java
-          echo "AVD home:"
-          sdkmanager --list | grep "system-images" || true
+      - name: Check paths
+        continue-on-error: true
+        run: |
+          echo "Emulator AVDs:"
+          emulator -list-avds
+          echo "ADB version"
+          adb --version
+          echo "ADB devices:"
+          adb devices
       - name: Set up android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
