@@ -23,6 +23,15 @@ jobs:
         run: |
           npm install -g appium@3
           appium driver install uiautomator2
+      - name: Verify appium installation
+        run: |
+          echo "Appium version:"
+          appium --version
+          echo "Appium location:"
+          which appium
+          echo "Global npm root directory:"
+          npm root -g
+          find $(npm root -g)/appium -type f -name "main.js" 2>/dev/null || echo "main.js not found in npm global location"
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -53,8 +62,6 @@ jobs:
             adb devices # List connected devices
             echo "Boot status of the emulator:"
             adb shell getprop sys.boot_completed
-            # adb -s emulator-5554 emu avd name
-            # emulator -avd pixel_3 # Start the emulator in the background
             mvn -B test
           emulator-boot-timeout: 300
       - name: Upload test report
