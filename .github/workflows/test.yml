@@ -44,16 +44,22 @@ jobs:
           echo "JAVA_HOME: $JAVA_HOME"
           echo emulator path: $ANDROID_SDK_ROOT/emulator
           echo tools path: $ANDROID_SDK_ROOT/tools
+          echo "Android SDK contents:"
           ls -la $ANDROID_SDK_ROOT
+          echo "Platform tools:"
           ls -la $ANDROID_SDK_ROOT/platform-tools
+          echo "Emulator:"
           ls -la $ANDROID_SDK_ROOT/emulator
+          echo "System images:"
           ls -la $ANDROID_SDK_ROOT/system-images
+          echo "Command line tools:"
           ls -la $ANDROID_SDK_ROOT/cmdline-tools
-          ls -la $HOME/.android/avd
           $ANDROID_SDK_ROOT/emulator/emulator --version
           $ANDROID_SDK_ROOT/emulator/emulator -list-avds
           emulator --version
           emulator -list-avds
+          $ANDROID_SDK_ROOT/platform-tools/adb --version
+          $ANDROID_SDK_ROOT/platform-tools/adb devices
           adb --version
           adb devices
           which adb
