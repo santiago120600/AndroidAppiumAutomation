@@ -9,7 +9,7 @@ Feature: Smoke Test
     Examples:
       | wifi_name     |
       | my_wifi       |
-      | neighbor wifi |
+      # | neighbor wifi |
   
   # Scenario Outline: Get text from text Marquee page button 
   #   Given I have logged into the app

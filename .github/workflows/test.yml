@@ -41,6 +41,8 @@ jobs:
           echo "Global npm root directory:"
           npm root -g
           find $(npm root -g) -name "main.js" -path "*/appium/*"
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -102,7 +104,14 @@ jobs:
             echo ""
             echo "Emulator properties:"
             adb shell getprop | grep emu
-            mvn -B test -Dprofile=${{ env.PROFILE }}
+            docker build -t appium-tests .
+            docker run --rm \
+              --network host \
+              --add-host=host.docker.internal:host-gateway \
+              -e PROFILE=${{ env.PROFILE }} \
+              -e APP_PATH="$(pwd)/src/test/resources/ApiDemos-debug.apk" \
+              -v $(pwd)/target:/app/target \
+              appium-tests
           emulator-boot-timeout: 300
       - name: Upload test report
         uses: actions/upload-artifact@v7

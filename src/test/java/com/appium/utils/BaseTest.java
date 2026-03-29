@@ -49,22 +49,22 @@ public class BaseTest {
             throw e;
         }
 
-        if (!checkIfAndroidEmulatorIsRunnning()) {
-            logger.info("Emulator is not running. Starting emulator...");
-            startEmulator();
-            emulatorStartedByTest = true;
-        } else {
-            logger.info("Emulator is already running.");
-        }
+        // if (!checkIfAndroidEmulatorIsRunnning()) {
+        //     logger.info("Emulator is not running. Starting emulator...");
+        //     startEmulator();
+        //     emulatorStartedByTest = true;
+        // } else {
+        //     logger.info("Emulator is already running.");
+        // }
 
-        if (!checkIfAppiumServerIsRunnning(Integer.parseInt(prop.getProperty("appium.port")))) {
-            logger.info("Appium server is not running. Starting Appium server...");
-            startAppiumServer();
-            serverStartedByTest = true;
-        } else {
-            logger.info("Appium server is already running.");
-            service = createAppiumServiceBuilder().build();
-        }
+        // if (!checkIfAppiumServerIsRunnning(Integer.parseInt(prop.getProperty("appium.port")))) {
+        //     logger.info("Appium server is not running. Starting Appium server...");
+        //     startAppiumServer();
+        //     serverStartedByTest = true;
+        // } else {
+        //     logger.info("Appium server is already running.");
+        //     service = createAppiumServiceBuilder().build();
+        // }
 
         logger.info("Initializing AndroidDriver...");
         driver = initializeDriver();
@@ -210,9 +210,10 @@ public class BaseTest {
     private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
         UiAutomator2Options options = new UiAutomator2Options();
         options.setDeviceName(getProfile());
-        Path path = Paths.get(prop.getProperty("app.location"));
-        options.setApp(path.toAbsolutePath().toString());
-        return new AndroidDriver(new URI("http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port")).toURL(), options);
+        options.setApp(System.getProperty("app.path"));
+        String serverUrl = "http://" + prop.getProperty("appium.server") + ":" + prop.getProperty("appium.port");
+        logger.info("Connecting to Appium server at: {}", serverUrl);
+        return new AndroidDriver(new URI(serverUrl).toURL(), options);
     }
 
     public void tearDown() {
@@ -220,18 +221,18 @@ public class BaseTest {
             driver.quit();
             logger.info("AndroidDriver quit successfully.");
         }
-        if (service != null && serverStartedByTest) {
-            service.stop();
-            logger.info("Appium server stopped.");
-        }
-        else {
-            logger.info("Appium server was not started by this test; leaving it running.");
-        }
-        if(emulatorStartedByTest){
-            stopEmulator();
-        }else{
-            logger.info("Android Emulator was not started by this test; leaving it running.");
-        }
+        // if (service != null && serverStartedByTest) {
+        //     service.stop();
+        //     logger.info("Appium server stopped.");
+        // }
+        // else {
+        //     logger.info("Appium server was not started by this test; leaving it running.");
+        // }
+        // if(emulatorStartedByTest){
+        //     stopEmulator();
+        // }else{
+        //     logger.info("Android Emulator was not started by this test; leaving it running.");
+        // }
     }
 
     private void stopEmulator() {
