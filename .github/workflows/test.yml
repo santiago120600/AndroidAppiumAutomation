@@ -54,7 +54,11 @@ jobs:
           target: default
           script: |
             docker build -t appium-tests .
-            docker run --rm --network host --add-host=host.docker.internal:host-gateway -e PROFILE=${{ env.PROFILE }} -e APP_PATH="$(pwd)/src/test/resources/ApiDemos-debug.apk" -v "$(pwd)/target:/app/target" appium-tests
+            docker run --rm --network host --add-host=host.docker.internal:host-gateway \
+              -e PROFILE="${{ env.PROFILE }}" \
+              -e APP_PATH="$(pwd)/src/test/resources/ApiDemos-debug.apk" \
+              -v "$(pwd)/target:/app/target" \
+              appium-tests
           emulator-boot-timeout: 300
       - name: Upload test report
         if: always()
