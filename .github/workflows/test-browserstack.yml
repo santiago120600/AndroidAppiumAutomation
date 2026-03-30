@@ -1,0 +1,37 @@
+name: Run tests
+on: 
+  push:
+    branches:
+      - 'browserstack'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v6
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v5
+      - name: Build and run tests in Docker
+        env:
+          PROFILE: ${{ vars.DEVICE_NAME }}
+          APP_PATH: ${{ vars.APP }}
+          PLATFORM_VERSION: ${{ vars.PLATFORM_VERSION }}
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+            docker build -t appium-tests .
+            docker run --rm --network host --add-host=host.docker.internal:host-gateway \
+              -e PROFILE=${{ env.PROFILE }} \
+              -e APP_PATH=${{ env.APP_PATH }} \
+              -e PLATFORM_VERSION=${{ env.PLATFORM_VERSION }} \
+              -v "$(pwd)/target:/app/target" \
+              appium-tests
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: |
+            target/cucumber-reports.html
+            appium.log

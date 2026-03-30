@@ -1,0 +1,13 @@
+userName: ${BROWSERSTACK_USERNAME}
+accessKey: ${BROWSERSTACK_ACCESS_KEY}
+framework: cucumber
+app: bs://a7fb2aeb4e0d001ff4224bd3a00e3e662854fac6
+platforms:
+  - platformName: android
+    deviceName: Google Pixel 7
+    platformVersion: '13.0'
+buildName: Appium Java JUnit5 - Android
+projectName: Appium Java JUnit5
+debug: true
+networkLogs: true
+browserstackLocal: false
