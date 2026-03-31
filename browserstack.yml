@@ -9,3 +9,4 @@ projectName: Appium Java JUnit5
 debug: true
 networkLogs: true
 browserstackLocal: false
+appiumLogs: false
