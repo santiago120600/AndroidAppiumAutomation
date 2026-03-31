@@ -81,6 +81,12 @@
             <includes>
             <include>**/TestRunner.java</include>
             </includes>
+            <properties>
+                <property>
+                    <name>browserstack.sdk</name>
+                    <value>true</value>
+                </property>
+            </properties>
         </configuration>
         </plugin>
     </plugins>

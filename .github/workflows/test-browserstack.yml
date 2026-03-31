@@ -14,9 +14,6 @@ jobs:
         uses: docker/setup-docker-action@v5
       - name: Build and run tests in Docker
         env:
-          PROFILE: ${{ vars.DEVICE_NAME }}
-          APP_PATH: ${{ vars.APP }}
-          PLATFORM_VERSION: ${{ vars.PLATFORM_VERSION }}
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |

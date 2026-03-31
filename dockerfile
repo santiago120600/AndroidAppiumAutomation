@@ -15,11 +15,8 @@ COPY src /app/src
 COPY pom.xml /app/pom.xml
 COPY browserstack.yml /app/browserstack.yml
 
-ENV PROFILE=
-ENV APP_PATH=
-ENV PLATFORM_VERSION=
 ENV BROWSERSTACK_USERNAME=
 ENV BROWSERSTACK_ACCESS_KEY=
 
 # Run Maven tests
-ENTRYPOINT ["sh", "-c", "mvn test -Dbrowserstack.username=\"${BROWSERSTACK_USERNAME}\" -Dbrowserstack.accesskey=\"${BROWSERSTACK_ACCESS_KEY}\""]
+ENTRYPOINT ["sh", "-c", "mvn test -Dbrowserstack.sdk=true"]

@@ -210,8 +210,11 @@ public class BaseTest {
     }
 
     private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
-        userName = System.getProperty("browserstack.username");
-        accessKey = System.getProperty("browserstack.accesskey");
+        userName = System.getenv("BROWSERSTACK_USERNAME");
+        accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
+        if (userName == null || userName.isEmpty() || accessKey == null || accessKey.isEmpty()) {
+            throw new IllegalStateException("BrowserStack credentials not provided. Set BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY");
+        }
         logger.info("Connecting to BrowserStack...");
         return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), new UiAutomator2Options());
     }
