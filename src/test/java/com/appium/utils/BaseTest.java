@@ -216,7 +216,9 @@ public class BaseTest {
             throw new IllegalStateException("BrowserStack credentials not provided. Set BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY");
         }
         logger.info("Connecting to BrowserStack...");
-        return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), new UiAutomator2Options());
+        UiAutomator2Options options = new UiAutomator2Options();
+
+        return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), options);
     }
 
     public void tearDown() {
