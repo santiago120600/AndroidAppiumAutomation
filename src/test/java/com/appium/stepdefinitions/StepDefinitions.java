@@ -17,7 +17,7 @@ public class StepDefinitions{
 
     @Given("I have logged into the app")
     public void i_have_logged_into_the_app() {
-        System.out.println("Logged into the app successfully");
+        pageFactory.getLandingPage().dismissStartupDialogs();
     }
     
     @When("I navigate to the wifi settings")

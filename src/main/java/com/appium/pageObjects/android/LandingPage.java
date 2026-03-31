@@ -90,4 +90,8 @@ public class LandingPage extends BasePageObject {
     public void clickViews() {
         click(Views);
     }
+
+    public void dismissStartupDialogs() {
+        dismissAllStartupDialogs();
+    }
 }

@@ -30,4 +30,3 @@ jobs:
           name: test-report
           path: |
             target/cucumber-reports.html
-            appium.log

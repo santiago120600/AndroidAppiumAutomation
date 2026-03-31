@@ -1,5 +1,5 @@
 framework: cucumber
-app: bs://a7fb2aeb4e0d001ff4224bd3a00e3e662854fac6
+app: bs://c2a08c736e074aadbcf170e869b59ca917eee9c5
 platforms:
   - platformName: android
     deviceName: Samsung Galaxy S22 Ultra
