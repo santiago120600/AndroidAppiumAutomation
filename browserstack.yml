@@ -10,6 +10,7 @@ debug: true
 networkLogs: true
 browserstackLocal: false
 appiumLogs: true
+noReset: false
 autoGrantPermissions: true
 autoAcceptAlerts: true
 autoDismissAlerts: true
