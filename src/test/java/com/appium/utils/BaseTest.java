@@ -31,9 +31,6 @@ public class BaseTest {
     protected AndroidDriver driver;
     public String userName;
     public String accessKey;
-    public String app;
-    public String deviceName;
-    public String platformVersion;
     private Properties prop;
     private boolean serverStartedByTest = false;
     private boolean emulatorStartedByTest = false;
@@ -213,21 +210,10 @@ public class BaseTest {
     }
 
     private AndroidDriver initializeDriver() throws URISyntaxException, MalformedURLException {
-        UiAutomator2Options options = new UiAutomator2Options();
-        // userName = System.getenv("BROWSERSTACK_USERNAME") != null ? System.getenv("BROWSERSTACK_USERNAME") : (String) browserStackYamlMap.get("userName");
-        // accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY") != null ? System.getenv("BROWSERSTACK_ACCESS_KEY") : (String) browserStackYamlMap.get("accessKey");
         userName = System.getProperty("browserstack.username");
         accessKey = System.getProperty("browserstack.accesskey");
-
-        app = System.getProperty("app.path");
-        deviceName = System.getProperty("device.name");
-        platformVersion = System.getProperty("platform.version");
-        options.setCapability("appium:app", app);
-        options.setCapability("appium:deviceName", deviceName);
-        options.setCapability("appium:platformVersion", platformVersion);
-        // logger.info("Using BrowserStack credentials - Username: {}, Access Key: {}", userName, accessKey);
-        logger.info("Desired Capabilities - App: {}, Device Name: {}, Platform Version: {}", app, deviceName, platformVersion);
-        return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), options);
+        logger.info("Connecting to BrowserStack...");
+        return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), new UiAutomator2Options());
     }
 
     public void tearDown() {
