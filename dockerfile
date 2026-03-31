@@ -19,4 +19,4 @@ ENV BROWSERSTACK_USERNAME=
 ENV BROWSERSTACK_ACCESS_KEY=
 
 # Run Maven tests
-ENTRYPOINT ["sh", "-c", "mvn test -Dbrowserstack.sdk=true"]
+ENTRYPOINT ["sh", "-c", "mvn test -DBROWSERSTACK_USERNAME=\"${BROWSERSTACK_USERNAME}\" -DBROWSERSTACK_ACCESS_KEY=\"${BROWSERSTACK_ACCESS_KEY}\" -Dbrowserstack.sdk=true"]
