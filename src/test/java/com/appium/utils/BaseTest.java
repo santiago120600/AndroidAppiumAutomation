@@ -217,7 +217,7 @@ public class BaseTest {
         }
         logger.info("Connecting to BrowserStack...");
         UiAutomator2Options options = new UiAutomator2Options();
-
+        options.setCapability("autoGrantPermissions", true);
         return new AndroidDriver(new URI(String.format("https://%s:%s@hub.browserstack.com/wd/hub", userName , accessKey)).toURL(), options);
     }
 
